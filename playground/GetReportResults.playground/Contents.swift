@@ -19,10 +19,7 @@ func solution(_ id_list: [String], _ report:[String], _ k:Int) -> [Int] {
         reportResult_count[id_list[i]] = 0
         i += 1
     }
-    
-    print(reportResult_name)
-    print("-----------------------")
-    
+
     for data in report {
         let names = data.split(separator: " ").map { String($0) }
         let whoReport: String = names[0]
@@ -46,14 +43,11 @@ func solution(_ id_list: [String], _ report:[String], _ k:Int) -> [Int] {
         }
     }
     
-    
     var notiCounts : [String: Int] = [String: Int]()
     var k: Int = 0
     
     for (key, value) in reportResult_name {
         let ids: [String] = value
-        print("\(key)/\(ids)")
-        
         for name in ids {
             if beStopped.contains(name) {
                 k += 1
@@ -67,20 +61,6 @@ func solution(_ id_list: [String], _ report:[String], _ k:Int) -> [Int] {
     for id in id_list {
         result.append(notiCounts[id]!)
     }
-    
-    print(result)
-    print("-----------------------")
-    
-    
-    
-    for (key, value) in reportResult_count {
-        print("\(key)/\(value)")
-    }
-        
-    print("-----------------------")
-    print(beStopped)
-    
-    
-    
+
     return result
 }
