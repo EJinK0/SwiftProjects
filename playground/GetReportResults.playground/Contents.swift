@@ -1,4 +1,5 @@
 import UIKit
+import CoreGraphics
 
 var greeting = "Hello, playground"
 
@@ -11,7 +12,7 @@ solution(id_list, report, k)
 func solution(_ id_list: [String], _ report:[String], _ k:Int) -> [Int] {
     var reportResult_name: [String: [String]] = [String: [String]]()
     var reportResult_count: [String: Int] = [String: Int]()
-    
+    var beStopped: [String] = [String]()
     var i: Int = 0
     
     for _ in id_list {
@@ -33,13 +34,10 @@ func solution(_ id_list: [String], _ report:[String], _ k:Int) -> [Int] {
             var reportedCount: Int = reportResult_count[personReported]!
             reportedCount += 1
             reportResult_count[personReported] = reportedCount
-        }
-    }
-    
-    var beStopped: [String] = [String]()
-    for (key, value) in reportResult_count {
-        if value >= k {
-            beStopped.append(key)
+            
+            if reportedCount >= k && !beStopped.contains(personReported) {
+                beStopped.append(personReported)
+            }
         }
     }
     
@@ -61,6 +59,8 @@ func solution(_ id_list: [String], _ report:[String], _ k:Int) -> [Int] {
     for id in id_list {
         result.append(notiCounts[id]!)
     }
+    
+    print(result)
 
     return result
 }
