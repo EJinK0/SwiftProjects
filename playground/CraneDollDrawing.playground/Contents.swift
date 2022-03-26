@@ -15,29 +15,35 @@ solution(board, moves: moves)
 func solution(_ board: [[Int]], moves: [Int]) -> Int {
     var boardTemp: [[Int]] = board
     var pocket: [Int] = [Int]()
-    var row: Int = board.count
-    var column: Int = board.first?.count ?? 5
+    let row: Int = board.count
+    //var column: Int = board.first?.count ?? 5
+    var removedDoll: Int = 0
     
-    //print(board.count)
     for i in 0...moves.count-1 {
-        var move: Int = moves[i]-1
-        var selectDoll: Int = 0
-        //print(move)
+        let move: Int = moves[i]-1
+        
+        if boardTemp[row-1][move] == 0 {
+            //print("all zero no doll")
+            continue
+        }
+        
         for j in 0...row - 1 {
-            print("\(j) \(move) \(boardTemp[j][move])")
-            var pick: Int = boardTemp[j][move]
+//            print("\(i) \(j) \(move) \(boardTemp[j][move])")
+            let pick: Int = boardTemp[j][move]
             if pick == 0 {
                 continue
             }
             else {
                 pocket.append(boardTemp[j][move])
                 boardTemp[j][move] = 0
+                if pocket.count > 1 && pocket[pocket.count-2] == pocket[pocket.count-1] {
+                    pocket.removeLast()
+                    pocket.removeLast()
+                    removedDoll += 2
+                }
                 break
             }
-            
         }
-        print("------")
     }
-    print(pocket)
-    return 0
+    return removedDoll
 }
