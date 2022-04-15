@@ -12,6 +12,8 @@ solution(places)
 func solution(_ places:[[String]]) -> [Int] {
     var person: [(Int, Int)] = [(Int, Int)]()
     var manhattanTwoUnder: [(Int, Int)] = [(Int, Int)]()
+    var result: [Int] = [Int]()
+    var isKeepDistance: Bool = true
     
     for (i,room) in places.enumerated() {
         //print("\(i) \(room)")
@@ -26,13 +28,16 @@ func solution(_ places:[[String]]) -> [Int] {
         }
         
         print("person: \(person)")
-        print("-------------------")
         
+        if person.count == 0 {
+            result.append(1)
+            continue
+        }
         
         for (i,(x,y)) in person.enumerated() {
             for j in i+1..<person.count {
                 var tupel: (Int, Int) = person[j]
-                if abs((x - tupel.0) + (y - tupel.1)) <= 2 {
+                if abs(x - tupel.0) + abs(y - tupel.1) <= 2 {
                     manhattanTwoUnder.append((x,y))
                     manhattanTwoUnder.append(tupel)
                 }
@@ -40,13 +45,38 @@ func solution(_ places:[[String]]) -> [Int] {
         }
 
         print("manhattanTwoUnder \(manhattanTwoUnder))")
-        //print("manhattanTwoUnder \(manhattanTwoUnder))")
+        
+        
+        var count = 0;
+        for (i,(x,y)) in manhattanTwoUnder.enumerated() {
+            if count == 1 {
+                count = 0
+                continue
+            }
+            var next: (Int,Int) = manhattanTwoUnder[i+1]
+            if (places[x][next.1] != "X" && places[x][next.1] != "P")
+                || (places[next.0][y] != "X" && places[next.0][y] != "P") {
+                result.append(0)
+                isKeepDistance = false
+            }
+
+            if !isKeepDistance {
+                break
+            }
+
+            count += 1
+        }
+
+        if isKeepDistance{
+            result.append(1)
+        }
+        
         person.removeAll()
         manhattanTwoUnder.removeAll()
-        //print(result)
-        //print(manhattanTwoUnder)
+        
+        print("---------------")
     }
     
-    
+    print(result)
     return []
 }
