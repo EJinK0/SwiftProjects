@@ -9,105 +9,94 @@ var cmd: [String] = ["D 2","C","U 3","C","D 4","C","U 2","Z","Z"]
 var cmd2: [String] = ["D 2","C","U 3","C","D 4","C","U 2","Z","Z","U 1","C"]
 var cmd3: [String] = ["C", "C", "C"]
 
-solution(n, k, cmd2)
+solution(n, k, cmd)
 
-func solution(_ n:Int, _ k:Int, _ cmd:[String]) -> String {
-    var selectedIdx = k
-    var indexing: [Int] = [Int]()
-    var origin: [String] = [String]()
-    var deletedIdx: [Int] = [Int]()
+class Node {
+    var data: Int?
+    var next: Node?
+    var prev: Node?
     
-    for i in 0..<n {
-        indexing.append(i)
-        origin.append("O")
+    init(data: Int, next: Node?, prev: Node?) {
+        self.data = data
+        self.next = next
+        self.prev = prev
     }
+}
+
+struct LinkedList {
+    var head: Node?
+    var tail: Node?
+    var cursor: Node?
+    var isDeleted: [Bool] = []
     
-    print(indexing)
-    
-    for command in cmd {
-        print(command)
-        var split = command.split(separator: " ")
-        if split[0] == "U" {
-            let num = Int(split[1])
-            var count = 1
-            var isNegative: Bool = false
-            while !isNegative {
-                selectedIdx -= 1
-                if num == 1 {
-                    if indexing[selectedIdx] == -1 {
-                        continue
-                    } else {
-                        isNegative = true
-                        continue
-                    }
-                } else {
-                    if count == num {
-                        isNegative = true
-                        continue
-                    }
-                    
-                    if indexing[selectedIdx] == -1 {
-                        continue
-                    } else {
-                        count += 1
-                        continue
-                    }
-                }
-            }
-        } else if split[0] == "D" {
-            let num = Int(split[1])
-            var count = 1
-            var isNegative: Bool = false
-            while !isNegative {
-                selectedIdx += 1
-                if num == 1 {
-                    if indexing[selectedIdx] == -1 {
-                        continue
-                    } else {
-                        isNegative = true
-                        continue
-                    }
-                } else {
-                    if count == num {
-                        isNegative = true
-                        continue
-                    }
-                    
-                    if indexing[selectedIdx] == -1 {
-                        continue
-                    } else {
-                        count += 1
-                        continue
-                    }
-                }
-            }
-        } else if split[0] == "C" {
-            indexing[selectedIdx] = -1
-            deletedIdx.append(selectedIdx)
-            if selectedIdx == indexing.count - 1 {
-                selectedIdx -= 1
-                print(selectedIdx)
-                continue
-            }
-            selectedIdx += 1
-        } else if split[0] == "Z" {
-            var lastItem = deletedIdx.removeLast()
-            indexing[lastItem] = lastItem
-            //print(selectedIdx)
+    mutating func append(data: Int, isInitCursor: Bool) {
+        let node = Node(data: data, next: nil, prev: nil)
+        if isInitCursor { cursor = node }
+        
+        if head == nil {
+            head = node
+            tail = node
+        } else {
+            node.prev = tail
+            tail?.next = node
+            tail = node
         }
         
-        print(selectedIdx)
+        isDeleted.append(false)
     }
     
-    var result: String = ""
-    for item in indexing {
-        if item == -1 {
-            result += "X"
-        } else {
-            result += "O"
+    mutating func remove() -> Node? {
+        let delNode = cursor
+        cursor?.next?.prev = cursor?.prev
+        cursor?.prev?.next = cursor?.next
+        cursor = delNode?.next == nil ? delNode?.prev : delNode?.next
+        
+        isDeleted[delNode!.data!] = true
+        return delNode
+    }
+    
+    mutating func moveUp(to amount: Int) {
+        for _ in 0..<amount {
+            cursor = cursor?.prev
         }
     }
-    print(indexing)
-    print(result)
-    return result
+    
+    mutating func moveDown(to amount: Int) {
+        for _ in 0..<amount {
+            cursor = cursor?.next
+        }
+    }
+    
+    mutating func restore(node: Node?) {
+        node?.prev?.next = node
+        node?.next?.prev = node
+        isDeleted[node!.data!] = false
+    }
+}
+
+func solution(_ n:Int, _ k:Int, _ cmd:[String]) -> String {
+    var table = LinkedList()
+    var deleteStack: [Node?] = []
+    
+    for i in 0..<n {
+        table.append(data: i, isInitCursor: i == k)
+    }
+    
+    for command in cmd {
+        let splitCommand = command.components(separatedBy: " ")
+        switch splitCommand[0] {
+        case "D":
+            table.moveDown(to: Int(splitCommand[1])!)
+        case "U":
+            table.moveUp(to: Int(splitCommand[1])!)
+        case "C":
+            deleteStack.append(table.remove())
+        case "Z":
+            table.restore(node: deleteStack.removeLast())
+        default:
+            break
+        }
+    }
+    
+    return table.isDeleted.map( {$0 ? "X" : "O"} ).joined(separator: "")
 }
