@@ -27,16 +27,39 @@ func solution(_ info:[String], _ query:[String]) -> [Int] {
         for (j,c) in col.enumerated() {
             if c == "-" {continue}
             if j == 4 {
-                tempInfo = tempInfo.filter{Int(String($0.components(separatedBy: " ").last!))! >= Int(c)! }
+                result.append(BinarySearch(tempInfo, Int(c)!))
             } else {
                 tempInfo = tempInfo.filter {$0.contains(c)}
             }
         }
-        
-        result.append(tempInfo.count)
+
         tempInfo = info
     }
     
     print(result)
     return result
+}
+
+func BinarySearch(_ infos:[String],_ score: Int) -> Int {
+    var scores: [Int] = []
+    
+    var startIdx: Int = 0
+    var endIdx: Int = infos.count
+    var serchIndex: Int = infos.count / 2
+    
+    for i in infos {
+        scores.append(Int(i.components(separatedBy: " ").last!)!)
+    }
+    scores = scores.sorted(by: <)
+    
+    while startIdx < endIdx {
+        serchIndex = (startIdx + endIdx) / 2
+        if score <= scores[serchIndex] {
+            endIdx = serchIndex
+        } else {
+            startIdx = serchIndex + 1
+        }
+    }
+    
+    return infos.count - endIdx
 }
